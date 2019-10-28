@@ -1,0 +1,21 @@
+name: flutter_current_locale
+description: Flutter Current Locale Plugin
+version: 1.0.0+1
+author: aleksander.slater@olavstoppen.no
+homepage: https://olavstoppen.no
+
+environment:
+  sdk: ">=2.3.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  plugin:
+    androidPackage: no.olavstoppen.flutter_current_locale
+    pluginClass: FlutterCurrentLocalePlugin
