@@ -1,5 +1,6 @@
 import Flutter
 import UIKit
+import CoreTelephony
 
 public class SwiftFlutterCurrentLocalePlugin: NSObject, FlutterPlugin
 {
@@ -10,6 +11,14 @@ public class SwiftFlutterCurrentLocalePlugin: NSObject, FlutterPlugin
         let fallback = Locale.current.languageCode ?? "en"
         guard let preferred = Locale.preferredLanguages.first else { return fallback }
         return Locale(identifier:preferred).languageCode ?? fallback
+    }
+
+    func getCurrentCountryCode() -> String
+    {
+        let fallback = ""
+        guard let carrier = CTTelephonyNetworkInfo().subscriberCellularProvider else { return fallback }
+        guard let countryCode = carrier.isoCountryCode else { return "" }
+        return countryCode
     }
 
     public static func register(with registrar: FlutterPluginRegistrar)
@@ -24,6 +33,7 @@ public class SwiftFlutterCurrentLocalePlugin: NSObject, FlutterPlugin
         switch call.method
         {
         case "getCurrentLanguage": result(getCurrentLanguage())
+        case "getCurrentCountryCode": result(getCurrentCountryCode())
         default: result(FlutterMethodNotImplemented)
         }
     }

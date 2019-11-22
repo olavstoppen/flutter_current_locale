@@ -9,21 +9,32 @@ class CurrentLocale
 
   Future<String> getCurrentLocale() async
   {
-    if (Platform.isIOS || Platform.isAndroid)
-    {
-      var platform = MethodChannel(kChannelName);
-      try
-      {
-        String result = await platform.invokeMethod('getCurrentLanguage');
-        if (result != null)
-        {
-          return Future.value(result);
-        }
-      }
-      on PlatformException catch (e)
-      {
+    return _invokeMethod("getCurrentLanguage");
+  }
 
+  Future<String> getCurrentCountryCode() async
+  {
+    return _invokeMethod("getCurrentCountryCode");
+  }
+
+  Future<String> _invokeMethod(String method) async
+  {
+    var supported = Platform.isIOS || Platform.isAndroid;
+    if (!supported)
+      return Future.value(null);
+
+    var platform = MethodChannel(kChannelName);
+    try
+    {
+      String result = await platform.invokeMethod(method);
+      if (result != null)
+      {
+        return Future.value(result);
       }
+    }
+    on PlatformException catch (e)
+    {
+
     }
     return Future.value(null);
   }

@@ -15,6 +15,7 @@ class _MyAppState extends State<MyApp>
 {
   CurrentLocale locale = CurrentLocale();
   String _currentLocale = 'Unknown';
+  String _currentCountryCode = "Uknown";
 
   @override
   void initState()
@@ -36,6 +37,17 @@ class _MyAppState extends State<MyApp>
       currentLocale = 'Failed to get locale.';
     }
 
+    String currentCountryCode;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try
+    {
+      currentCountryCode = await locale.getCurrentCountryCode();
+    }
+    on PlatformException {
+      currentCountryCode = 'Failed to get country code.';
+    }
+
+
     // If the widget was removed from the tree while the asynchronous platform
     // message was in flight, we want to discard the reply rather than calling
     // setState to update our non-existent appearance.
@@ -43,6 +55,7 @@ class _MyAppState extends State<MyApp>
 
     setState(() {
       _currentLocale = currentLocale;
+      _currentCountryCode = currentCountryCode;
     });
   }
 
@@ -51,10 +64,13 @@ class _MyAppState extends State<MyApp>
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Locale Info'),
         ),
         body: Center(
-          child: Text('Running in: $_currentLocale\n'),
+          child: Column(mainAxisSize:MainAxisSize.min,children:[
+            Text('Current Language: $_currentLocale\n'),
+            Text('Current Country Code: $_currentCountryCode\n')
+          ]),
         ),
       ),
     );
