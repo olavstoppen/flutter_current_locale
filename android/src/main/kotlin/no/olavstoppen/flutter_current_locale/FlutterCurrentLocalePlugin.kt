@@ -30,6 +30,15 @@ class FlutterCurrentLocalePlugin(private val context: Context) : MethodCallHandl
       else
         result.notImplemented()
     }
+    else if(call.method == "getCurrentCountryCode")
+    {
+      val language = getCurrentCountryCode()
+      if (language != null)
+        result.success(language)
+      else
+        result.notImplemented()
+    }
+
     else
     {
       result.notImplemented()
@@ -55,4 +64,25 @@ class FlutterCurrentLocalePlugin(private val context: Context) : MethodCallHandl
       return current.language
     }
   }
+
+  private fun getCurrentCountryCode(): String?
+  {
+    val configuration = context.resources.configuration
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+    {
+      val list = configuration.locales
+      if (list.size() > 0)
+      {
+        val locale = list.get(0)
+        return locale.country
+      }
+      return null
+    }
+    else
+    {
+      @Suppress("DEPRECATION") val current = context.resources.configuration.locale
+      return current.country
+    }
+  }
+
 }
