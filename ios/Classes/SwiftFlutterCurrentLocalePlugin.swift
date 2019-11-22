@@ -15,10 +15,17 @@ public class SwiftFlutterCurrentLocalePlugin: NSObject, FlutterPlugin
 
     func getCurrentCountryCode() -> String
     {
-        let fallback = ""
+        let fallback = fallbackRegion()
         guard let carrier = CTTelephonyNetworkInfo().subscriberCellularProvider else { return fallback }
-        guard let countryCode = carrier.isoCountryCode else { return "" }
+        guard let countryCode = carrier.isoCountryCode else { return fallback }
         return countryCode
+    }
+    
+    func fallbackRegion() -> String
+    {
+        let fallback = Locale.current.regionCode ?? "GB"
+        guard let preferred = Locale.preferredLanguages.first else { return fallback }
+        return Locale(identifier:preferred).regionCode ?? fallback
     }
 
     public static func register(with registrar: FlutterPluginRegistrar)
