@@ -30,10 +30,24 @@ class FlutterCurrentLocalePlugin(private val context: Context) : MethodCallHandl
       else
         result.notImplemented()
     }
+    else if (call.method == "getCurrentCountryCode")
+    {
+      val code = getCurrentCountryCode()
+      if (code != null)
+        result.success(code)
+      else
+        result.notImplemented()
+    }
     else
     {
       result.notImplemented()
     }
+  }
+
+  private fun getCurrentCountryCode(): String?
+  {
+    // TODO: Get the country code from the phone (dont base it on the Locale as thats not going to be accurate)
+    return null
   }
 
   private fun getCurrentLanguage(): String?
