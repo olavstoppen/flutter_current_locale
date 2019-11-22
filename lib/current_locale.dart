@@ -32,7 +32,7 @@ class CurrentLocale
         return Future.value(result);
       }
     }
-    on PlatformException catch (e)
+    catch (e)
     {
 
     }
