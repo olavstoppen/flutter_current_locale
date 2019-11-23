@@ -35,8 +35,8 @@ class CurrentLocale
         CurrentLocaleInfo getInfo(String key)
         {
           final fallback = CurrentLocaleInfo();
-          if (!result.containsKey("country")) return fallback;
-          var d = result["country"];
+          if (!result.containsKey(key)) return fallback;
+          var d = result[key];
           if (d is Map<String,String>)
           {
             String phone;
