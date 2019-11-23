@@ -47,6 +47,15 @@ class _MyAppState extends State<MyApp>
       currentCountryCode = 'Failed to get country code.';
     }
 
+    CurrentLocaleResult currentLocaleResult;
+
+    try
+    {
+      currentLocaleResult = await locale.getCurrentLocale();
+    }
+    on PlatformException {
+    }
+
 
     // If the widget was removed from the tree while the asynchronous platform
     // message was in flight, we want to discard the reply rather than calling

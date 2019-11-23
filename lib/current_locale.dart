@@ -36,18 +36,20 @@ class CurrentLocale
         {
           final fallback = CurrentLocaleInfo();
           if (!result.containsKey(key)) return fallback;
-          var d = result[key];
-          if (d is Map<String,String>)
-          {
+          try{
+            var d = Map<String, String>.from(result[key]);
             String phone;
             String locale;
             if (d.containsKey("phone"))
               phone = d["phone"];
             if (d.containsKey("locale"))
               locale = d["locale"];
-            return CurrentLocaleInfo(phone:phone,locale:locale);
+            return CurrentLocaleInfo(phone: phone, locale: locale);
+          } catch (e)
+          {
+            return fallback;
           }
-          return fallback;
+
         }
         var country = getInfo("country");
         var language = getInfo("language");
