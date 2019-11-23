@@ -19,16 +19,16 @@ public class SwiftFlutterCurrentLocalePlugin: NSObject, FlutterPlugin
         return countryCode
     }
     
-    func fallbackRegion() -> String
+    func fallbackRegion() -> String?
     {
-        let fallback = Locale.current.regionCode ?? "GB"
+        let fallback = Locale.current.regionCode
         guard let preferred = Locale.preferredLanguages.first else { return fallback }
         return Locale(identifier:preferred).regionCode ?? fallback
     }
 
-    func fallbackLanguage() -> String
+    func fallbackLanguage() -> String?
     {
-        return Locale.current.languageCode ?? "en"
+        return Locale.current.languageCode
     }
     
     func getCurrentLocale() -> [String:Any]
