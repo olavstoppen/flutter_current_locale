@@ -28,7 +28,7 @@ class FlutterCurrentLocalePlugin(private val context: Context) : MethodCallHandl
     }
     else if (call.method == "getCurrentCountryCode")
     {
-      result.success(getCurrentCountryCode() ?? fallbackCountryCode())      
+      result.success(getCurrentCountryCode() ?: fallbackCountryCode())
     }
     else if (call.method == "getCurrentLocale")
     {
