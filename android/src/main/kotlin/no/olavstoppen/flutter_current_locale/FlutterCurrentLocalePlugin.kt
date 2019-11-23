@@ -32,8 +32,20 @@ class FlutterCurrentLocalePlugin(private val context: Context) : MethodCallHandl
     }
     else if (call.method == "getCurrentLocale")
     {
-      // TODO: Need to implement this similar to how its done on ios
-      result.notImplemented()
+      val language = mapOf(
+              "phone" to getCurrentLanguage(),
+              "locale" to getCurrentLanguage()
+      )
+
+      val country = mapOf(
+              "phone" to getCurrentCountryCode(),
+              "locale" to fallbackCountryCode()
+      )
+
+      result.success(mapOf(
+              "language" to language,
+              "country" to country
+      ))
     }
     else
     {
