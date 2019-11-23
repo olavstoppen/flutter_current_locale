@@ -8,10 +8,8 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
 
-
 class FlutterCurrentLocalePlugin(private val context: Context) : MethodCallHandler
 {
-
   companion object
   {
     @JvmStatic
@@ -25,20 +23,17 @@ class FlutterCurrentLocalePlugin(private val context: Context) : MethodCallHandl
   override fun onMethodCall(call: MethodCall, result: Result)
   {
     if (call.method == "getCurrentLanguage")
-    {
-      val language = getCurrentLanguage()
-      if (language != null)
-        result.success(language)
-      else
-        result.notImplemented()
+    {      
+      result.success(getCurrentLanguage())      
     }
     else if (call.method == "getCurrentCountryCode")
     {
-      val code = getCurrentCountryCode()
-      if (code != null)
-        result.success(code)
-      else
-        result.notImplemented()
+      result.success(getCurrentCountryCode() ?? fallbackCountryCode())      
+    }
+    else if (call.method == "getCurrentLocale")
+    {
+      // TODO: Need to implement this similar to how its done on ios
+      result.notImplemented()
     }
     else
     {
@@ -47,8 +42,7 @@ class FlutterCurrentLocalePlugin(private val context: Context) : MethodCallHandl
   }
 
   private fun getCurrentCountryCode(): String?
-  {
-    // TODO: Get the country code from the phone (dont base it on the Locale as thats not going to be accurate)
+  {    
     val manager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
     if (manager != null)
     {
@@ -58,10 +52,10 @@ class FlutterCurrentLocalePlugin(private val context: Context) : MethodCallHandl
         return countryId
       }
     }
-    return fallback()
+    return null
   }
 
-  private fun fallback(): String?
+  private fun fallbackCountryCode(): String?
   {
     val configuration = context.resources.configuration
     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
@@ -80,7 +74,6 @@ class FlutterCurrentLocalePlugin(private val context: Context) : MethodCallHandl
       return current.country
     }
   }
-
 
   private fun getCurrentLanguage(): String?
   {
