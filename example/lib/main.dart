@@ -14,7 +14,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp>
 {
   CurrentLocale locale = CurrentLocale();
-  String _currentLocale = 'Unknown';
+  String _currentLanguage = 'Unknown';
   String _currentCountryCode = "Uknown";
 
   @override
@@ -27,14 +27,14 @@ class _MyAppState extends State<MyApp>
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async
   {
-    String currentLocale;
+    String currentLanguage;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try
     {
-      currentLocale = await locale.getCurrentLocale();
+      currentLanguage = await locale.getCurrentLanguage();
     }
     on PlatformException {
-      currentLocale = 'Failed to get locale.';
+      currentLanguage = 'Failed to get language.';
     }
 
     String currentCountryCode;
@@ -54,7 +54,7 @@ class _MyAppState extends State<MyApp>
     if (!mounted) return;
 
     setState(() {
-      _currentLocale = currentLocale;
+      _currentLanguage = currentLanguage;
       _currentCountryCode = currentCountryCode;
     });
   }
@@ -68,7 +68,7 @@ class _MyAppState extends State<MyApp>
         ),
         body: Center(
           child: Column(mainAxisSize:MainAxisSize.min,children:[
-            Text('Current Language: $_currentLocale\n'),
+            Text('Current Language: $_currentLanguage\n'),
             Text('Current Country Code: $_currentCountryCode\n')
           ]),
         ),
