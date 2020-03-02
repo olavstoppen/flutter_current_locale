@@ -5,7 +5,23 @@ import CoreTelephony
 public class SwiftFlutterCurrentLocalePlugin: NSObject, FlutterPlugin
 {
     static let kChannelName = "plugins.olavstoppen.no/current_locale"
-
+    
+    func getCurrentLocaleIdentifier() -> String
+    {
+        let fallback = Locale.current
+        guard let preferred = Locale.preferredLanguages.first else { return fallback.identifier }
+        let locale = Locale(identifier:preferred)
+        guard let region = locale.regionCode else { return fallback.identifier }
+        guard let language = locale.languageCode else { return fallback.identifier }
+        return "\(language)_\(region)"
+    }
+    
+    func getCurrentLocaleDecimalSeparator() -> String?
+    {
+        let locale = Locale.current
+        return locale.decimalSeparator
+    }
+    
     func getCurrentLanguage() -> String?
     {
         guard let preferred = Locale.preferredLanguages.first else { return nil }
@@ -19,13 +35,19 @@ public class SwiftFlutterCurrentLocalePlugin: NSObject, FlutterPlugin
         return countryCode
     }
     
-    func fallbackRegion() -> String?
+    func fallbackRegionLocale() -> String?
     {
         let fallback = Locale.current.regionCode
         guard let preferred = Locale.preferredLanguages.first else { return fallback }
-        return Locale(identifier:preferred).regionCode ?? fallback
+        let locale = Locale(identifier:preferred)
+        return locale.regionCode ?? fallback
     }
 
+    func getCurrentRegion() -> String?
+    {
+        return Locale.current.regionCode
+    }
+    
     func fallbackLanguage() -> String?
     {
         return Locale.current.languageCode
@@ -34,6 +56,8 @@ public class SwiftFlutterCurrentLocalePlugin: NSObject, FlutterPlugin
     func getCurrentLocale() -> [String:Any]
     {
         var d = [String:Any]()
+        d["identifier"] = getCurrentLocaleIdentifier()
+        d["decimals"] = getCurrentLocaleDecimalSeparator()
         
         var language = [String:Any]()
         language["phone"] = getCurrentLanguage()
@@ -42,7 +66,8 @@ public class SwiftFlutterCurrentLocalePlugin: NSObject, FlutterPlugin
         
         var country = [String:Any]()
         country["phone"] = getCurrentCountryCode()
-        country["locale"] = fallbackRegion()
+        country["locale"] = fallbackRegionLocale()
+        country["region"] = getCurrentRegion()
         d["country"] = country
         
         return d
@@ -60,7 +85,7 @@ public class SwiftFlutterCurrentLocalePlugin: NSObject, FlutterPlugin
         switch call.method
         {
         case "getCurrentLanguage": result(getCurrentLanguage() ?? fallbackLanguage())
-        case "getCurrentCountryCode": result(getCurrentCountryCode() ?? fallbackRegion())
+        case "getCurrentCountryCode": result(getCurrentCountryCode() ?? fallbackRegionLocale())
         case "getCurrentLocale": result(getCurrentLocale())
         default: result(FlutterMethodNotImplemented)
         }

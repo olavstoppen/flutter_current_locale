@@ -11,6 +11,12 @@ dependencies:
   flutter:
     sdk: flutter
 
+  intl: 0.16.0
+  
+  flutter_money_formatter:
+    git:
+      url: git://github.com/anisalibegic/flutter_money_formatter.git
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

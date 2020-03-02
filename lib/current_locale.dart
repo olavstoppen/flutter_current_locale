@@ -32,7 +32,15 @@ class CurrentLocale
       dynamic result = await platform.invokeMethod("getCurrentLocale");
       if (result != null && result is Map)
       {
-        CurrentLocaleInfo getInfo(String key)
+        String getString(String key)
+        {
+           String identifier;
+            if (result.containsKey(key))
+              identifier = result[key];
+            return identifier;
+        }
+
+        CurrentLocaleInfo getLocale(String key)
         {
           final fallback = CurrentLocaleInfo();
           if (!result.containsKey(key)) return fallback;
@@ -49,11 +57,28 @@ class CurrentLocale
           {
             return fallback;
           }
-
         }
-        var country = getInfo("country");
-        var language = getInfo("language");
-        return Future.value(CurrentLocaleResult(language:language,country:country));
+        CurrentCountryInfo getCountry(String key)
+        {
+          var info = getLocale(key);
+          try
+          {
+            var d = Map<String, String>.from(result[key]);
+            String region;            
+            if (d.containsKey("region"))
+              region = d["region"];            
+            return CurrentCountryInfo(locale:info.locale,phone:info.phone,region:region);
+          } 
+          catch (e)
+          {
+            return CurrentCountryInfo(locale:info.locale,phone:info.phone);
+          }
+        }
+        var identifier = getString("identifier");
+        var decimals = getString("decimals");
+        var country = getCountry("country");
+        var language = getLocale("language");
+        return Future.value(CurrentLocaleResult(identifier:identifier,decimals:decimals,language:language,country:country));
       }
     }
     catch (e)
@@ -88,10 +113,12 @@ class CurrentLocale
 
 class CurrentLocaleResult
 {
+  final String identifier;
+  final String decimals;
   final CurrentLocaleInfo language;
-  final CurrentLocaleInfo country;
+  final CurrentCountryInfo country;
 
-  CurrentLocaleResult({@required this.language,@required this.country});
+  CurrentLocaleResult({@required this.identifier,@required this.decimals,@required this.language,@required this.country});
 }
 
 class CurrentLocaleInfo
@@ -100,4 +127,11 @@ class CurrentLocaleInfo
   final String locale;
 
   CurrentLocaleInfo({this.phone,this.locale});
+}
+
+class CurrentCountryInfo extends CurrentLocaleInfo
+{
+  final String region;
+  
+  CurrentCountryInfo({String phone,String locale,this.region}) : super(phone:phone,locale:locale);
 }
