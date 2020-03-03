@@ -1,12 +1,14 @@
 package no.olavstoppen.flutter_current_locale
 
 import android.content.Context
+import android.icu.text.DecimalFormatSymbols
 import android.telephony.TelephonyManager
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
+import java.util.*
 
 class FlutterCurrentLocalePlugin(private val context: Context) : MethodCallHandler
 {
@@ -22,34 +24,34 @@ class FlutterCurrentLocalePlugin(private val context: Context) : MethodCallHandl
 
   override fun onMethodCall(call: MethodCall, result: Result)
   {
-    if (call.method == "getCurrentLanguage")
-    {      
-      result.success(getCurrentLanguage())      
-    }
-    else if (call.method == "getCurrentCountryCode")
+    when
     {
-      result.success(getCurrentCountryCode() ?: fallbackCountryCode())
-    }
-    else if (call.method == "getCurrentLocale")
-    {
-      val language = mapOf(
-              "phone" to getCurrentLanguage(),
-              "locale" to getCurrentLanguage()
-      )
+      call.method == "getCurrentLanguage" -> result.success(getCurrentLanguage())
+      call.method == "getCurrentCountryCode" -> result.success(getCurrentCountryCode() ?: fallbackCountryCode())
+      call.method == "getCurrentLocale" -> {
 
-      val country = mapOf(
-              "phone" to getCurrentCountryCode(),
-              "locale" to fallbackCountryCode()
-      )
+        val identifier = getIdentifier()
+        val decimalSeparator = getDecimalSeparator()
 
-      result.success(mapOf(
-              "language" to language,
-              "country" to country
-      ))
-    }
-    else
-    {
-      result.notImplemented()
+        val language = mapOf(
+                "phone" to getCurrentLanguage(),
+                "locale" to getCurrentLanguage()
+        )
+
+        val country = mapOf(
+                "phone" to getCurrentCountryCode(),
+                "locale" to fallbackCountryCode(),
+                "region" to getRegion()
+        )
+
+        result.success(mapOf(
+                "identifier" to identifier,
+                "decimals" to decimalSeparator,
+                "language" to language,
+                "country" to country
+        ))
+      }
+      else -> result.notImplemented()
     }
   }
 
@@ -61,7 +63,7 @@ class FlutterCurrentLocalePlugin(private val context: Context) : MethodCallHandl
       val countryId = manager.simCountryIso
       if (countryId != null && countryId.isNotEmpty())
       {
-        return countryId
+        return countryId.toUpperCase()
       }
     }
     return null
@@ -76,14 +78,77 @@ class FlutterCurrentLocalePlugin(private val context: Context) : MethodCallHandl
       if (list.size() > 0)
       {
         val locale = list.get(0)
-        return locale.country
+        return locale.country.toUpperCase()
       }
       return null
     }
     else
     {
       @Suppress("DEPRECATION") val current = context.resources.configuration.locale
-      return current.country
+      return current.country.toUpperCase()
+    }
+  }
+
+  private fun getIdentifier() : String?
+  {
+    val configuration = context.resources.configuration
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+    {
+      val list = configuration.locales
+      if (list.size() > 0)
+      {
+        val locale = list.get(0)
+        return locale.toLanguageTag()
+      }
+      return null
+    }
+    else
+    {
+      @Suppress("DEPRECATION")
+      val current = context.resources.configuration.locale
+      return current.toLanguageTag()
+    }
+  }
+
+  private fun getRegion() : String?
+  {
+    val configuration = context.resources.configuration
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+    {
+      val list = configuration.locales
+      if (list.size() > 0)
+      {
+        val locale = list.get(0)
+        return locale.country.toUpperCase()
+      }
+      return null
+    }
+    else
+    {
+      @Suppress("DEPRECATION")
+      val current = context.resources.configuration.locale
+      return current.country.toUpperCase()
+    }
+  }
+
+  private fun getDecimalSeparator(): String?
+  {
+    val configuration = context.resources.configuration
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+    {
+      val list = configuration.locales
+      if (list.size() > 0)
+      {
+        val locale = list.get(0)
+        val symbols = DecimalFormatSymbols(locale)
+        return symbols.decimalSeparator.toString()
+      }
+      return null
+    }
+    else
+    {
+      val symbols = DecimalFormatSymbols()
+      return symbols.decimalSeparator.toString()
     }
   }
 
