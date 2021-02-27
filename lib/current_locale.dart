@@ -3,99 +3,25 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'dart:html' as html;
 
 class CurrentLocale
 {
   static const String kChannelName = "plugins.olavstoppen.no/current_locale";
 
-  bool get isPlatformSupported
-  {
-    if(kIsWeb) return true;
-    return Platform.isIOS || Platform.isAndroid;
-  }
+  bool get isPlatformSupported => Platform.isIOS || Platform.isAndroid;
 
   Future<String> getCurrentLanguage() async
   {
-    if(kIsWeb)
-    {
-      var language = html.window.navigator.language;
-      if(language == null) return "nb";
-      switch(language)
-      {
-        case "nb-NO":
-        case "nb":
-        case "no":
-        case "nn": return "nb";
-        case "en-US":
-        case "en": return "en";
-      }
-      return "nb";
-    }
-
     return _invokeMethod("getCurrentLanguage");
   }
 
   Future<String> getCurrentCountryCode() async
   {
-    if(kIsWeb)
-    {
-      var language = html.window.navigator.language;
-      if(language == null) return "NO";
-      switch(language)
-      {
-        case "nb-NO":
-        case "nb":
-        case "no":
-        case "nn": return "NO";
-        case "en-US":
-        case "en": return "US";
-      }
-      return "NO";
-    }
-
     return _invokeMethod("getCurrentCountryCode");
-  }
-
-  CurrentLocaleResult get noCurrentLocalResult
-  {
-    return CurrentLocaleResult(
-        identifier: "nb_NO",
-        decimals: ",",
-        language: CurrentLocaleInfo(phone: "nb",locale: "no"),
-        country: CurrentCountryInfo(phone: null, locale: "NO", region: "NO")
-    );
-  }
-
-  CurrentLocaleResult get enCurrentLocaleResult
-  {
-    return CurrentLocaleResult(
-        identifier: "en_US",
-        decimals: ",",
-        language: CurrentLocaleInfo(phone: "en",locale: "en"),
-        country: CurrentCountryInfo(phone: null, locale: "US", region: "US")
-    );
   }
 
   Future<CurrentLocaleResult> getCurrentLocale() async
   {
-    if(kIsWeb)
-    {
-      var language = html.window.navigator.language;
-      if(language == null) return Future.value(noCurrentLocalResult);
-      switch(language)
-      {
-        case "nb-NO":
-        case "nb":
-        case "no":
-        case "nn": return Future.value(noCurrentLocalResult);
-        case "en-US":
-        case "en": return Future.value(enCurrentLocaleResult);
-      }
-      return Future.value(noCurrentLocalResult);
-    }
-
-
     var supported = isPlatformSupported;
     if (!supported)
       return Future.value(null);
